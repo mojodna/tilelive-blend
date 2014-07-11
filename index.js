@@ -2,8 +2,7 @@
 
 var url = require("url");
 
-var _ = require("highland"),
-    async = require("async"),
+var async = require("async"),
     mapnik = require("mapnik");
 
 module.exports = function(tilelive, options) {
@@ -80,101 +79,6 @@ module.exports = function(tilelive, options) {
         }
       ], callback);
     });
-  };
-
-  Blend.prototype.getTileHighland = function(z, x, y, callback) {
-    var idx = 0;
-
-    _(this.sources)
-      .stopOnError(function(err) {
-        return callback(err);
-      })
-      .map(function(source) {
-        return _(function(push, next) {
-          console.log("getTile");
-          return source.getTile(z, x, y, function(err, buffer, headers) {
-            console.log("gotTile");
-            push(err, [buffer, headers]);
-            return push(null, _.nil);
-          });
-        });
-      })
-      .parallel(10)
-      .map(function(data) {
-        var buffer = data[0],
-            headers = data[1];
-
-        return _(function(push, next) {
-          console.log("fromBytes");
-          return mapnik.Image.fromBytes(buffer, function(err, im) {
-            console.log("fromBytten");
-            push(err, [im, headers]);
-            return push(null, _.nil);
-          });
-        });
-      })
-      .parallel(10)
-      .map(function(data) {
-        var im = data[0],
-            headers = data[1];
-
-        return _(function(push, next) {
-          console.log("premultiply");
-          return im.premultiply(function(err) {
-            console.log("premultiplied");
-            push(err, [im, headers]);
-            return push(null, _.nil);
-          });
-        });
-      })
-      .parallel(10)
-      .reduce1(function(a, b) {
-        var im1 = a[0],
-            im2 = b[0];
-
-        return _(function(push, next) {
-          console.log("composite", idx, this.operations[idx], this.filters[idx]);
-
-          return im2.composite(im1, {
-            comp_op: mapnik.compositeOp[this.operations[idx] || "src_over"],
-            filters: this.filters[idx++]
-          }, function(err, out) {
-            console.log("composited");
-            push(err, out);
-            return push(null, _.nil);
-          });
-        }.bind(this));
-      }.bind(this))
-      .merge()
-      .map(function(im) {
-        return _(function(push, next) {
-          console.log("demultiply");
-
-          return im.demultiply(function(err) {
-            console.log("demultiplied");
-            setImmediate(function() {
-            push(err, im);
-            return push(null, _.nil);
-            });
-          });
-        });
-      })
-      .parallel(10)
-      .map(function(im) {
-        return _(function(push, next) {
-          console.log("encode");
-          return im.encode(this.format, function(err, buffer) {
-            console.log("encoded");
-            push(err, buffer);
-            return push(null, _.nil);
-          });
-        });
-      })
-      .parallel(10)
-      .apply(function(buffer) {
-        console.log("each", buffer);
-        return callback(null, buffer);
-      });
   };
 
   Blend.prototype.getInfo = function(callback) {
