@@ -1,0 +1,16 @@
+{
+  "name": "tilelive-blend",
+  "version": "0.0.0",
+  "description": "A tilelive provider that blends.",
+  "main": "index.js",
+  "author": "Seth Fitzsimmons <seth@mojodna.net>",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^0.9.0",
+    "highland": "^1.25.4",
+    "mapnik": "^1.4.10"
+  },
+  "peerDependencies": {
+    "tilelive": "*"
+  }
+}
