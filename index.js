@@ -11,26 +11,23 @@ module.exports = function(tilelive, options) {
       uri = url.parse(uri, true);
     }
 
-    this.layers = uri.query.layers;
-    this.offsets = uri.query.offsets;
-    this.opacities = uri.query.opacities;
-    this.operations = uri.query.operations;
-    this.filters = uri.query.filters;
-    this.format = uri.query.format;
+    this.layers = uri.query.layers || [];
+    this.offsets = uri.query.offsets || [];
+    this.opacities = uri.query.opacities || [];
+    this.operations = uri.query.operations || [];
+    this.filters = uri.query.filters || [];
+    this.format = uri.query.format || "png";
 
-    _(this.layers)
-      .map(_.wrapCallback(tilelive.load))
-      .parallel(10)
-      .stopOnError(function(err) {
-        return callback(err);
-      })
-      .toArray(function(sources) {
-        this.sources = sources;
+    return async.map(this.layers, function(layer, done) {
+      return tilelive.load(layer, done);
+    }, function(err, sources) {
+      this.sources = sources;
 
-        return callback(null, this);
-      }.bind(this));
+      return callback(null, this);
+    }.bind(this));
   };
 
+  // TODO retina support / tileSize / scale
   Blend.prototype.getTile = function(z, x, y, callback) {
     var offsets = this.offsets,
         opacities = this.opacities,
@@ -82,7 +79,16 @@ module.exports = function(tilelive, options) {
   };
 
   Blend.prototype.getInfo = function(callback) {
-    return setImmediate(callback);
+    return setImmediate(function() {
+      return callback(null, {
+        layers: this.layers,
+        offsets: this.offsets,
+        opacities: this.opacities,
+        operations: this.operations,
+        filters: this.filters,
+        format: this.format
+      });
+    }.bind(this));
   };
 
   Blend.prototype.close = function(callback) {
