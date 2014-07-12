@@ -3,7 +3,8 @@
 var url = require("url");
 
 var async = require("async"),
-    mapnik = require("mapnik");
+    mapnik = require("mapnik"),
+    tiletype = require("tiletype");
 
 module.exports = function(tilelive, options) {
   var Blend = function(uri, callback) {
@@ -13,34 +14,46 @@ module.exports = function(tilelive, options) {
 
     this.layers = uri.query.layers || [];
     this.offsets = uri.query.offsets || [];
-    this.opacities = uri.query.opacities || [];
+    this.opacities = (uri.query.opacities || []).map(Number);
     this.operations = uri.query.operations || [];
     this.filters = uri.query.filters || [];
     this.format = uri.query.format || "png";
+    this.scale = uri.query.scale;
+    this.tileSize = (uri.query.tileSize | 0) || 256;
 
-    return async.map(this.layers, function(layer, done) {
-      return tilelive.load(layer, done);
-    }, function(err, sources) {
-      this.sources = sources;
-
+    return setImmediate(function() {
       return callback(null, this);
     }.bind(this));
   };
 
-  // TODO retina support / tileSize / scale
   Blend.prototype.getTile = function(z, x, y, callback) {
     var offsets = this.offsets,
         opacities = this.opacities,
         operations = this.operations,
         filters = this.filters,
-        format = this.format;
+        format = this.format,
+        scale = this.scale,
+        tileSize = this.tileSize;
 
-    return async.map(this.sources, function(source, done) {
+    return async.map(this.layers, function(layer, done) {
       return async.waterfall([
         function(cb) {
-          return source.getTile(z, x, y, cb);
+          if (typeof(layer) === "string") {
+            layer = url.parse(layer, true);
+          }
+
+          layer.query.scale = layer.query.scale || scale;
+          layer.query.tileSize = layer.query.tileSize || tileSize;
+
+          return tilelive.load(layer, cb);
         },
-        function(buffer, headers, cb) {
+        function(source, cb) {
+          return source.getTile(z, x, y, function(err, buffer) {
+            // TODO capture headers
+            return cb(err, buffer);
+          });
+        },
+        function(buffer, cb) {
           return mapnik.Image.fromBytes(buffer, cb);
         },
         function(im, cb) {
@@ -74,7 +87,15 @@ module.exports = function(tilelive, options) {
         function(im, cb) {
           return im.encode(format, cb);
         }
-      ], callback);
+      ], function(err, buffer) {
+        if (err) {
+          return callback(err);
+        }
+
+        var headers = tiletype.headers(tiletype.type(buffer));
+
+        return callback(null, buffer, headers);
+      });
     });
   };
 
