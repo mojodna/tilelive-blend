@@ -22,3 +22,6 @@ Will it blend?
   }
 }
 ```
+
+If you need to blend over a solid color, use
+[`tilelive-solid`](https://github.com/mojodna/tilelive-solid).
