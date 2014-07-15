@@ -4,6 +4,7 @@ var url = require("url");
 
 var async = require("async"),
     mapnik = require("mapnik"),
+    mercator = new (require("sphericalmercator"))(),
     tiletype = require("tiletype");
 
 module.exports = function(tilelive, options) {
@@ -48,13 +49,49 @@ module.exports = function(tilelive, options) {
           return tilelive.load(layer, cb);
         },
         function(source, cb) {
-          return source.getTile(z, x, y, function(err, buffer) {
-            // TODO capture headers
-            return cb(err, buffer);
-          });
+          return async.waterfall([
+            function(_cb) {
+              return source.getInfo(_cb);
+            },
+            function(info, _cb) {
+              if (z < Math.max(0, info.minzoom | 0) || z > (info.maxzoom || Infinity)) {
+                return callback();
+              }
+
+              var xyz = mercator.xyz(info.bounds || [-180, -85.0511, 180, 85.0511], z);
+
+              if (x < xyz.minX ||
+                  x > xyz.maxX ||
+                  y < xyz.minY ||
+                  y > xyz.maxY) {
+                return callback();
+              }
+
+              return source.getTile(z, x, y, function(err, buffer) {
+                // TODO capture headers
+
+                if (err) {
+                  console.warn(err.stack);
+                }
+
+                if (err && !err.message.match(/Tile|Grid does not exist/)) {
+                  console.warn(err.stack);
+                }
+
+                // always claim success; it'll be treated as a transparent tile
+                // if it failed
+                return cb(null, buffer);
+              });
+            }
+          ], cb);
         },
         function(buffer, cb) {
-          return mapnik.Image.fromBytes(buffer, cb);
+          if (buffer) {
+            return mapnik.Image.fromBytes(buffer, cb);
+          }
+
+          // create an empty image if no data was provided
+          return cb(null, new mapnik.Image(tileSize, tileSize));
         },
         function(im, cb) {
           return im.premultiply(function(err) {
