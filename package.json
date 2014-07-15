@@ -12,5 +12,14 @@
   },
   "peerDependencies": {
     "tilelive": "*"
-  }
+  },
+  "homepage": "https://github.com/mojodna/tilelive-blend",
+  "bugs": "https://github.com/mojodna/tilelive-blend/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mojodna/tilelive-blend"
+  },
+  "files": [
+    "index.js"
+  ]
 }
