@@ -64,6 +64,7 @@ module.exports = function(tilelive, options) {
       ], done);
     }, function(err, images) {
       if (err) {
+        console.warn(err);
         return callback(err);
       }
 
