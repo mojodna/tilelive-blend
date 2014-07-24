@@ -2,6 +2,7 @@
 
 ## vNext
 
+* Recast configuration with stacks
 * Only request tiles expected to exist
 * Log errors raised when loaded sources
 

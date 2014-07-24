@@ -7,6 +7,8 @@ var async = require("async"),
     mercator = new (require("sphericalmercator"))(),
     tiletype = require("tiletype");
 
+var OPS = require("./comp-ops.json");
+
 module.exports = function(tilelive, options) {
   var Blend = function(uri, callback) {
     if (typeof(uri) === "string") {
@@ -14,11 +16,7 @@ module.exports = function(tilelive, options) {
     }
 
     this.layers = uri.query.layers || [];
-    this.offsets = uri.query.offsets || [];
-    this.opacities = (uri.query.opacities || []).map(Number);
-    this.operations = uri.query.operations || [];
-    this.filters = uri.query.filters || [];
-    this.format = uri.query.format || "png";
+    this.format = uri.query.format || "png32";
     this.scale = uri.query.scale;
     this.tileSize = (uri.query.tileSize | 0) || 256;
 
@@ -27,11 +25,10 @@ module.exports = function(tilelive, options) {
     }.bind(this));
   };
 
+  // TODO allow custom headers (User-Agent, X-Forwarded-For) to be passed
+  // through
   Blend.prototype.getTile = function(z, x, y, callback) {
-    var offsets = this.offsets,
-        opacities = this.opacities,
-        operations = this.operations,
-        filters = this.filters,
+    var layers = this.layers,
         format = this.format,
         scale = this.scale,
         tileSize = this.tileSize;
@@ -39,8 +36,8 @@ module.exports = function(tilelive, options) {
     return async.map(this.layers, function(layer, done) {
       return async.waterfall([
         function(cb) {
-          if (typeof(layer) === "string") {
-            layer = url.parse(layer, true);
+          if (typeof(layer.source) === "string") {
+            layer = url.parse(layer.source, true);
           }
 
           layer.query.scale = layer.query.scale || scale;
@@ -80,7 +77,7 @@ module.exports = function(tilelive, options) {
 
                 // always claim success; it'll be treated as a transparent tile
                 // if it failed
-                return cb(null, buffer);
+                return _cb(null, buffer);
               });
             }
           ], cb);
@@ -109,13 +106,14 @@ module.exports = function(tilelive, options) {
 
       return async.waterfall([
         function(done) {
-          return async.reduce(images.slice(1), images[0], function(im1, im2, cb) {
+          return async.reduce(images, new mapnik.Image(tileSize, tileSize), function(im1, im2, cb) {
+            console.log(layers[idx].opacity);
             return im1.composite(im2, {
-              comp_op: mapnik.compositeOp[operations[idx] || "src_over"],
-              opacity: opacities[idx] || 1,
-              image_filters: filters[idx] || "",
-              dx: (offsets[idx] || [])[0] || 0,
-              dy: (offsets[idx++] || [])[1] || 0
+              comp_op: mapnik.compositeOp[OPS[(layers[idx] || {})["comp-op"]] || "over"],
+              opacity: parseInt(layers[idx].opacity || 1),
+              image_filters: layers[idx].filters || "",
+              dx: Number((layers[idx].offset || [])[0] || 0),
+              dy: Number((layers[idx++].offset || [])[1] || 0)
             }, cb);
           }, done);
         },
@@ -141,10 +139,6 @@ module.exports = function(tilelive, options) {
     return setImmediate(function() {
       return callback(null, {
         layers: this.layers,
-        offsets: this.offsets,
-        opacities: this.opacities,
-        operations: this.operations,
-        filters: this.filters,
         format: this.format
       });
     }.bind(this));

@@ -9,15 +9,21 @@ Will it blend?
   protocol: "blend:",
   query: {
     layers: [
-      "tilejson+http://staging.tile.stamen.com/toner-background/index.json",
-      "tilejson+http://staging.tile.stamen.com/toner-labels/index.json"
+      {
+        source: "tilejson+http://staging.tile.stamen.com/toner-background/index.json",
+        opacity: 0.5,
+        filters: "color-to-alpha(#008800)",
+        offset: [5, -5]
+      },
+      {
+        source: "tilejson+http://staging.tile.stamen.com/toner-lines/index.json",
+        filters: "invert agg-stack-blur(1,1)"
+      },
+      {
+        source: "tilejson+http://staging.tile.stamen.com/toner-labels/index.json",
+        "comp-op": "over"
+      }
     ],
-    operations: [
-      "" // src_over
-    ],
-    filters: [
-      "" // nothing
-    ]
     format: "png32:z=1"
   }
 }

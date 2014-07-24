@@ -11,25 +11,20 @@ tilelive.load({
   protocol: "blend:",
   query: {
     layers: [
-      "tilejson+http://staging.tile.stamen.com/toner-background/index.json",
-      "tilejson+http://staging.tile.stamen.com/toner-lines/index.json",
-      "tilejson+http://staging.tile.stamen.com/toner-labels/index.json"
-    ],
-    offsets: [
-      [5, -5],
-      null
-    ],
-    opacities: [
-      0.5,
-      1
-    ],
-    operations: [
-      "", // src_over
-      null
-    ],
-    filters: [
-      "color-to-alpha(#008000)",
-      "invert agg-stack-blur(1,1)" // nothing
+      {
+        source: "tilejson+http://staging.tile.stamen.com/toner-background/index.json",
+        opacity: 0.5,
+        filters: "color-to-alpha(#008800)",
+        offset: [5, -5]
+      },
+      {
+        source: "tilejson+http://staging.tile.stamen.com/toner-lines/index.json",
+        filters: "invert agg-stack-blur(1,1)" 
+      },
+      {
+        source: "tilejson+http://staging.tile.stamen.com/toner-labels/index.json",
+        "comp-op": "over"
+      }
     ],
     format: "png32:z=1"
   }
