@@ -21,6 +21,23 @@ module.exports = function(tilelive, options) {
     this.scale = uri.query.scale;
     this.tileSize = (uri.query.tileSize | 0) || 256;
 
+    // warm the cache (note: assumes there is a cache)
+    setImmediate(function() {
+      var scale = this.scale,
+          tileSize = this.tileSize;
+
+      return async.mapSeries(this.layers, function(layer, done) {
+        if (typeof(layer) === "string") {
+          layer = url.parse(layer, true);
+        }
+
+        layer.query.scale = layer.query.scale || scale;
+        layer.query.tileSize = layer.query.tileSize || tileSize;
+
+        return tilelive.load(layer, done);
+      });
+    }.bind(this));
+
     return setImmediate(function() {
       return callback(null, this);
     }.bind(this));
