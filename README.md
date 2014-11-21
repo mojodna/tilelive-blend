@@ -10,17 +10,17 @@ Will it blend?
   query: {
     layers: [
       {
-        source: "tilejson+http://staging.tile.stamen.com/toner-background/index.json",
+        source: "tilejson+http://tile.stamen.com/toner-background/index.json",
         opacity: 0.5,
         filters: "color-to-alpha(#008800)",
         offset: [5, -5]
       },
       {
-        source: "tilejson+http://staging.tile.stamen.com/toner-lines/index.json",
+        source: "tilejson+http://tile.stamen.com/toner-lines/index.json",
         filters: "invert agg-stack-blur(1,1)"
       },
       {
-        source: "tilejson+http://staging.tile.stamen.com/toner-labels/index.json",
+        source: "tilejson+http://tile.stamen.com/toner-labels/index.json",
         "comp-op": "over"
       }
     ],
