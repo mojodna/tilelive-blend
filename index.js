@@ -109,7 +109,7 @@ module.exports = function(tilelive, options) {
           return async.reduce(images, new mapnik.Image(tileSize, tileSize), function(im1, im2, cb) {
             console.log(layers[idx].opacity);
             return im1.composite(im2, {
-              comp_op: mapnik.compositeOp[OPS[(layers[idx] || {})["comp-op"]] || "over"],
+              comp_op: mapnik.compositeOp[OPS[(layers[idx] || {})["comp-op"]] || "src_over"],
               opacity: parseInt(layers[idx].opacity || 1),
               image_filters: layers[idx].filters || "",
               dx: Number((layers[idx].offset || [])[0] || 0),
