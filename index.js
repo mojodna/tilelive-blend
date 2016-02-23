@@ -106,7 +106,9 @@ module.exports = function(tilelive, options) {
 
       return async.waterfall([
         function(done) {
-          return async.reduce(images, new mapnik.Image(tileSize, tileSize), function(im1, im2, cb) {
+          return async.reduce(images, new mapnik.Image(tileSize, tileSize, {
+            premultiplied: true
+          }), function(im1, im2, cb) {
             return im1.composite(im2, {
               comp_op: mapnik.compositeOp[OPS[(layers[idx] || {})["comp-op"]] || "src_over"],
               opacity: parseFloat(layers[idx].opacity || 1),
