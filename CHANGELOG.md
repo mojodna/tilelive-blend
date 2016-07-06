@@ -1,5 +1,9 @@
 # Changes
 
+## v0.2.1 - 7/5/16
+
+* Emit proper headers according to output image type
+
 ## v0.2.0 - 2/22/16
 
 * Update dependencies

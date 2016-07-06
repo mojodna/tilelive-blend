@@ -129,7 +129,7 @@ module.exports = function(tilelive, options) {
           return callback(err);
         }
 
-        var headers = tiletype.headers(tiletype.type(buffer));
+        var headers = tiletype.headers(buffer);
 
         return callback(null, buffer, headers);
       });
