@@ -1,5 +1,9 @@
 # Changes
 
+## v0.2.3 - 7/6/16
+
+* Default `scale` to `1`
+
 ## v0.2.2 - 7/6/16
 
 * Calculate tile size according to scale (if not provided)
