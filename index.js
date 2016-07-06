@@ -1,6 +1,7 @@
 "use strict";
 
-var url = require("url");
+var url = require("url"),
+    util = require("util");
 
 var async = require("async"),
     mapnik = require("mapnik"),
@@ -8,6 +9,27 @@ var async = require("async"),
     tiletype = require("tiletype");
 
 var OPS = require("./comp-ops.json");
+
+/**
+ * Find the shortest provided max-age Cache-Control header in a list of
+ * responses.
+ */
+var findShortestMaxAge = function(headers) {
+  // determine the shortest max-age for an upstream tile and use that
+  var maxAges = headers.map(function(h) {
+    return (h["Cache-Control"] || h["cache-control"] || "").split(",").map(function(c) {
+      return c.trim();
+    }).filter(function(c) {
+      return c.match(/^max-age=/);
+    }).map(function(c) {
+      return +c.split("=")[1];
+    })[0];
+  }).filter(function(age) {
+    return age != null;
+  });
+
+  return Math.min.apply(null, maxAges);
+};
 
 module.exports = function(tilelive, options) {
   var Blend = function(uri, callback) {
@@ -64,43 +86,52 @@ module.exports = function(tilelive, options) {
                 return callback();
               }
 
-              return source.getTile(z, x, y, function(err, buffer) {
-                // TODO capture headers
-
-                if (err) {
-                  console.warn(err.stack);
-                }
+              return source.getTile(z, x, y, function(err, buffer, headers) {
+                headers = headers || {};
 
                 if (err && !err.message.match(/Tile|Grid does not exist/)) {
                   console.warn(err.stack);
+                } else if (err) {
+                  // mark this tile as needing to be invalidated immediately
+                  headers["cache-control"] = "public, max-age=0";
                 }
 
                 // always claim success; it'll be treated as a transparent tile
                 // if it failed
-                return _cb(null, buffer);
+                return _cb(null, buffer, headers);
               });
             }
           ], cb);
         },
-        function(buffer, cb) {
+        function(buffer, headers, cb) {
           if (buffer) {
-            return mapnik.Image.fromBytes(buffer, cb);
+            return mapnik.Image.fromBytes(buffer, function(err, data) {
+              return cb(err, data, headers);
+            });
           }
 
           // create an empty image if no data was provided
-          return cb(null, new mapnik.Image(tileSize, tileSize));
+          return cb(null, new mapnik.Image(tileSize, tileSize), headers);
         },
-        function(im, cb) {
+        function(im, headers, cb) {
           return im.premultiply(function(err) {
-            return cb(err, im);
+            return cb(err, [im, headers]);
           });
         }
       ], done);
-    }, function(err, images) {
+    }, function(err, data) {
       if (err) {
         console.warn(err);
         return callback(err);
       }
+
+      var images = data.map(function(x) {
+          return x[0];
+        }),
+        headers = data.map(function(x) {
+          return x[1];
+        }),
+        maxAge = findShortestMaxAge(headers);
 
       var idx = 0;
 
@@ -130,6 +161,10 @@ module.exports = function(tilelive, options) {
         }
 
         var headers = tiletype.headers(buffer);
+
+        if (maxAge != null && maxAge < Infinity) {
+          headers["cache-control"] = util.format("public, max-age=%d", maxAge);
+        }
 
         return callback(null, buffer, headers);
       });

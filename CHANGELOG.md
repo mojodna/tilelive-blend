@@ -1,5 +1,9 @@
 # Changes
 
+## v0.3.0 - 7/6/16
+
+* Calculate an appropriate `Cache-Control` header
+
 ## v0.2.3 - 7/6/16
 
 * Default `scale` to `1`
