@@ -1,5 +1,9 @@
 # Changes
 
+## v0.2.2 - 7/6/16
+
+* Calculate tile size according to scale (if not provided)
+
 ## v0.2.1 - 7/5/16
 
 * Emit proper headers according to output image type

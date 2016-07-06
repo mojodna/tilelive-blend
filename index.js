@@ -17,8 +17,8 @@ module.exports = function(tilelive, options) {
 
     this.layers = uri.query.layers || [];
     this.format = uri.query.format || "png32";
-    this.scale = uri.query.scale;
-    this.tileSize = (uri.query.tileSize | 0) || 256;
+    this.scale = +uri.query.scale;
+    this.tileSize = (uri.query.tileSize | 0) || Math.floor(256 * this.scale);
 
     return setImmediate(function() {
       return callback(null, this);
