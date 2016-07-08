@@ -1,5 +1,9 @@
 # Changes
 
+## v0.3.1 - 7/7/16
+
+* Invalidate tiles that experienced errors, not missing tiles
+
 ## v0.3.0 - 7/6/16
 
 * Calculate an appropriate `Cache-Control` header

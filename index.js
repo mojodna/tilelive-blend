@@ -89,9 +89,9 @@ module.exports = function(tilelive, options) {
               return source.getTile(z, x, y, function(err, buffer, headers) {
                 headers = headers || {};
 
-                if (err && !err.message.match(/Tile|Grid does not exist/)) {
+                if (err && !err.message.match(/(Tile|Grid) does not exist/)) {
                   console.warn(err.stack);
-                } else if (err) {
+
                   // mark this tile as needing to be invalidated immediately
                   headers["cache-control"] = "public, max-age=0";
                 }
