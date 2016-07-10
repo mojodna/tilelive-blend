@@ -1,5 +1,9 @@
 # Changes
 
+## v0.4.5 - 7/10/16
+
+* Call the correct callback when a tile is out of range
+
 ## v0.4.4 - 7/10/16
 
 * Actually, those should have been errors
