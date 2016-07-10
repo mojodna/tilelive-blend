@@ -64,6 +64,8 @@ module.exports = function(tilelive, options) {
             layer = url.parse(layer.source, true);
           }
 
+          layer.query = layer.query || {};
+
           layer.query.scale = layer.query.scale || scale;
           layer.query.tileSize = layer.query.tileSize || tileSize;
 

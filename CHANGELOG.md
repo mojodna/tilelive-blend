@@ -1,5 +1,9 @@
 # Changes
 
+## v0.4.1 - 7/10/16
+
+* Default `query` property of `uri`
+
 ## v0.4.0 - 7/10/16
 
 * Allow `info` to be provided in `uri.query`
