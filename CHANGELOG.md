@@ -1,5 +1,9 @@
 # Changes
 
+## v0.4.3 - 7/10/16
+
+* Include the correct number of params when calling back
+
 ## v0.4.2 - 7/10/16
 
 * Handle layer URIs passed as objects
