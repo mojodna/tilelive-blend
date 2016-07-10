@@ -62,6 +62,8 @@ module.exports = function(tilelive, options) {
         function(cb) {
           if (typeof(layer.source) === "string") {
             layer = url.parse(layer.source, true);
+          } else {
+            layer = layer.source;
           }
 
           layer.query = layer.query || {};

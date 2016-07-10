@@ -1,5 +1,9 @@
 # Changes
 
+## v0.4.2 - 7/10/16
+
+* Handle layer URIs passed as objects
+
 ## v0.4.1 - 7/10/16
 
 * Default `query` property of `uri`
