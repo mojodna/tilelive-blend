@@ -78,7 +78,7 @@ module.exports = function(tilelive, options) {
             },
             function(info, _cb) {
               if (z < Math.max(0, info.minzoom | 0) || z > (info.maxzoom || Infinity)) {
-                return callback(null, null, {});
+                return callback(new Error("Tile does not exist"));
               }
 
               var xyz = mercator.xyz(info.bounds || [-180, -85.0511, 180, 85.0511], z);
@@ -87,7 +87,7 @@ module.exports = function(tilelive, options) {
                   x > xyz.maxX ||
                   y < xyz.minY ||
                   y > xyz.maxY) {
-                return callback(null, null, {});
+                return callback(new Error("Tile does not exist"));
               }
 
               return source.getTile(z, x, y, function(err, buffer, headers) {

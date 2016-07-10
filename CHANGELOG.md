@@ -1,5 +1,9 @@
 # Changes
 
+## v0.4.4 - 7/10/16
+
+* Actually, those should have been errors
+
 ## v0.4.3 - 7/10/16
 
 * Include the correct number of params when calling back
