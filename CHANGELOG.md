@@ -1,5 +1,9 @@
 # Changes
 
+## v0.4.6 - 7/10/16
+
+* Include the correct number of params when calling back
+
 ## v0.4.5 - 7/10/16
 
 * Call the correct callback when a tile is out of range
