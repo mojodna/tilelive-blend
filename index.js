@@ -44,9 +44,7 @@ module.exports = function(tilelive, options) {
 
     this.info = uri.query.info || {};
 
-    return setImmediate(function() {
-      return callback(null, this);
-    }.bind(this));
+    return setImmediate(callback, null, this);
   };
 
   // TODO allow custom headers (User-Agent, X-Forwarded-For) to be passed
