@@ -1,5 +1,10 @@
 # Changes
 
+## v0.4.0 - 7/10/16
+
+* Allow `info` to be provided in `uri.query`
+* Remove `layers` and `format` from exposed `info`
+
 ## v0.3.1 - 7/7/16
 
 * Invalidate tiles that experienced errors, not missing tiles

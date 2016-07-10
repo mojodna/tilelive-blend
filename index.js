@@ -42,6 +42,8 @@ module.exports = function(tilelive, options) {
     this.scale = +uri.query.scale || 1;
     this.tileSize = (uri.query.tileSize | 0) || Math.floor(256 * this.scale);
 
+    this.info = uri.query.info || {};
+
     return setImmediate(function() {
       return callback(null, this);
     }.bind(this));
@@ -172,12 +174,7 @@ module.exports = function(tilelive, options) {
   };
 
   Blend.prototype.getInfo = function(callback) {
-    return setImmediate(function() {
-      return callback(null, {
-        layers: this.layers,
-        format: this.format
-      });
-    }.bind(this));
+    return setImmediate(callback, null, this.info);
   };
 
   Blend.prototype.close = function(callback) {
