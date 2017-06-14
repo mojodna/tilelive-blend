@@ -7,12 +7,12 @@
   "license": "ISC",
   "dependencies": {
     "async": "^1.5.2",
-    "sphericalmercator": "^1.0.2",
-    "tiletype": "^0.3.0"
+    "@mapbox/sphericalmercator": "^1.0.2",
+    "@mapbox/tiletype": "^0.3.0"
   },
   "peerDependencies": {
     "mapnik": ">=1.4.9",
-    "tilelive": "*"
+    "@mapbox/tilelive": "*"
   },
   "homepage": "https://github.com/mojodna/tilelive-blend",
   "bugs": "https://github.com/mojodna/tilelive-blend/issues",

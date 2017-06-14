@@ -1,5 +1,9 @@
 # Changes
 
+## v0.5.0 - 6/13/17
+
+* Update dependencies
+
 ## v0.4.6 - 7/10/16
 
 * Include the correct number of params when calling back
