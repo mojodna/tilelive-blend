@@ -2,9 +2,9 @@
 
 var fs = require("fs");
 
-var tilelive = require("tilelive");
+var tilelive = require("@mapbox/tilelive");
 
-require("tilejson").registerProtocols(tilelive);
+require("@mapbox/tilejson").registerProtocols(tilelive);
 require("./")(tilelive);
 
 tilelive.load({

@@ -5,8 +5,8 @@ var url = require("url"),
 
 var async = require("async"),
     mapnik = require("mapnik"),
-    mercator = new (require("sphericalmercator"))(),
-    tiletype = require("tiletype");
+    mercator = new (require("@mapbox/sphericalmercator"))(),
+    tiletype = require("@mapbox/tiletype");
 
 var OPS = require("./comp-ops.json");
 
